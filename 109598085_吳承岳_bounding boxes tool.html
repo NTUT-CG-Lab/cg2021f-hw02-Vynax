@@ -90,6 +90,9 @@
 
 		let camera, scene, renderer, effect;
 		let mesh, helper;
+		let line = [];
+		line[2] = 3;
+		line[5] = 8;
 
 		const vpds = [];
 
@@ -319,6 +322,35 @@
 				morphs.open();
 
 			}
+			document.addEventListener('keypress', onDocumentKeyPress);
+		}
+
+		function onDocumentKeyPress(event) {
+
+			const keyCode = event.which;
+
+			// backspace
+
+			/* if (keyCode === 8) {
+
+				event.preventDefault();
+
+			} else { */
+
+			const ch = String.fromCharCode(keyCode);
+			switch (ch) {
+				case "1":
+				case "2":
+				case "3":
+				case "4":
+					// console.log("hi");
+					console.log(camera.zoom);
+					// console.log(line[5]);
+					break;
+			}
+			console.log(ch);
+
+			// }
 
 		}
 
