@@ -20,12 +20,12 @@
 
 <body>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
-		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank"
-			rel="noopener">MMD Assets license</a><br />
+		<!-- <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br /> -->
+		<!-- <a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br /> -->
 		Copyright
 		<a href="https://sites.google.com/view/evpvp/" target="_blank" rel="noopener">Model Data</a>
 		<a href="http://seiga.nicovideo.jp/seiga/im5162984" target="_blank" rel="noopener">Pose Data</a>
+		<br />
 	</div>
 
 	<script src="js/libs/ammo.wasm.js"></script>
@@ -47,7 +47,7 @@
 			so.addChild("視角可以移動及放大", 2, true);
 			so.addChild("在畫面上畫出左眼的邊框", 2, false);
 			so.addChild("複製左眼邊框變化到右眼", 2, false);
-			so.addChild("可選擇當前讀取角色或按鍵選擇上 / 下一隻角色", 1, false);
+			so.addChild("可選擇當下讀取角色或按鍵選擇上 / 下一隻角色", 1, false);
 			so.addChild("可儲存座標點檔案", 1, false);
 			so.addChild("回答問題", 2, false);
 
@@ -73,7 +73,7 @@
 			//產生 "開啟自評表按鈕"
 			so.renderBtn(
 				//自評表按鈕插入位置
-				document.body,
+				document.querySelector("#info"),
 				//自評表按鈕文字
 				"開啟自評表"
 			);
