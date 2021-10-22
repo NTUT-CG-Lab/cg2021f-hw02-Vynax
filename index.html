@@ -15,13 +15,20 @@
         a {
             color: #08f;
         }
+
+        .three {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
     </style>
 </head>
 
 <body>
     <div id="info">
-        <!-- <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br /> -->
-        <!-- <a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br /> -->
+        <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
+        <a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
         Copyright
         <a href="https://sites.google.com/view/evpvp/" target="_blank" rel="noopener">Model Data</a>
         <a href="http://seiga.nicovideo.jp/seiga/im5162984" target="_blank" rel="noopener">Pose Data</a>
@@ -73,7 +80,7 @@
             //產生 "開啟自評表按鈕"
             so.renderBtn(
                 //自評表按鈕插入位置
-                document.querySelector("#info"),
+                document.body,
                 //自評表按鈕文字
                 "開啟自評表"
             );
@@ -90,9 +97,10 @@
 
         let camera, scene, renderer, effect;
         let mesh, helper;
-        let line = [];
-        line[2] = 3;
-        line[5] = 8;
+        let line_exist = [];
+        // line[2] = 3;
+        // line[5] = 8;
+        let mouseWorld = new THREE.Vector3();
 
         const vpds = [];
 
@@ -108,6 +116,7 @@
         function init() {
 
             const container = document.createElement('div');
+            container.classList.add("three");
             document.body.appendChild(container);
             let scale = 30;
             camera = new THREE.OrthographicCamera(window.innerWidth / scale / - 2, window.innerWidth / scale / 2, window.innerHeight / scale / 2, window.innerHeight / scale / - 2, 0.1, 1000);
@@ -322,7 +331,21 @@
                 morphs.open();
 
             }
+            document.body.addEventListener('mousemove', onMousemove, false);
             document.addEventListener('keypress', onDocumentKeyPress);
+        }
+
+        function onMousemove(e) {
+            const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+
+            mouseWorld.set(
+                ((e.clientX - left + 1) / width) * 2 - 1,
+                -((e.clientY - top + 1) / height) * 2 + 1,
+                (camera.near + camera.far) / (camera.near - camera.far),
+            );
+            mouseWorld.unproject(camera);
+
+            console.log(mouseWorld);
         }
 
         function onDocumentKeyPress(event) {
