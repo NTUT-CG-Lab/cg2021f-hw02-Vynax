@@ -27,12 +27,12 @@
 
 <body>
     <div id="info">
-        <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
+        <!-- <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
         <a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
         Copyright
         <a href="https://sites.google.com/view/evpvp/" target="_blank" rel="noopener">Model Data</a>
         <a href="http://seiga.nicovideo.jp/seiga/im5162984" target="_blank" rel="noopener">Pose Data</a>
-        <br />
+        <br /> -->
     </div>
 
     <script src="js/libs/ammo.wasm.js"></script>
@@ -40,7 +40,7 @@
     <script>
         // 建構子 ScoreOutputer 接受一個字串，該字串為 csv 的檔案名稱
         // 以下面範例，檔名就為 "109598105(總分: 6).csv"
-        var so = new ScoreOutputer("109598105");
+        var so = new ScoreOutputer("109598085");
         so.installCSS(function () {
             // 安裝 bootstrap 的 css，如果在 html 上方引用 bootstrap 5.1.1 的話就不用使用 installCSS ，注意一定要 bootstrap css 5.1.1 版
             // installCSS 接收一個 callback 當作參數，作為成功安裝 bootstrap css 的回呼函式
@@ -80,7 +80,7 @@
             //產生 "開啟自評表按鈕"
             so.renderBtn(
                 //自評表按鈕插入位置
-                document.body,
+                document.querySelector("#info"),
                 //自評表按鈕文字
                 "開啟自評表"
             );
@@ -97,7 +97,8 @@
 
         let camera, scene, renderer, effect;
         let mesh, helper;
-        let line_exist = [];
+        let line_exist = [4];
+        let line_points = [];
         // line[2] = 3;
         // line[5] = 8;
         let mouseWorld = new THREE.Vector3();
@@ -116,7 +117,8 @@
         function init() {
 
             const container = document.createElement('div');
-            container.classList.add("three");
+            // container.classList.add("three");
+            // container.classList.add("body");
             document.body.appendChild(container);
             let scale = 30;
             camera = new THREE.OrthographicCamera(window.innerWidth / scale / - 2, window.innerWidth / scale / 2, window.innerHeight / scale / 2, window.innerHeight / scale / - 2, 0.1, 1000);
@@ -331,7 +333,7 @@
                 morphs.open();
 
             }
-            document.body.addEventListener('mousemove', onMousemove, false);
+            document.body.addEventListener('mousemove', onMousemove);
             document.addEventListener('keypress', onDocumentKeyPress);
         }
 
@@ -345,7 +347,23 @@
             );
             mouseWorld.unproject(camera);
 
-            console.log(mouseWorld);
+            // console.log(mouseWorld.x + ',' + mouseWorld.y + ',' + mouseWorld.z);
+
+            /* document.onclick = function () {
+                const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+                const points = [];
+ 
+                points.push(new THREE.Vector3(mouseWorld.x, mouseWorld.y - 10, 20));
+                points.push(new THREE.Vector3(mouseWorld.x, mouseWorld.y + 10, 20));
+ 
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+ 
+                const line = new THREE.Line(geometry, material);
+                line.name = "right";
+ 
+                scene.remove(scene.getObjectByName("right"));
+                scene.add(line);
+            } */
         }
 
         function onDocumentKeyPress(event) {
@@ -361,17 +379,28 @@
             } else { */
 
             const ch = String.fromCharCode(keyCode);
+
             switch (ch) {
                 case "1":
                 case "2":
                 case "3":
                 case "4":
-                    // console.log("hi");
-                    console.log(camera.zoom);
-                    // console.log(line[5]);
+                    const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+                    const points = [];
+
+                    points.push(new THREE.Vector3(mouseWorld.x, mouseWorld.y - 10, 20));
+                    points.push(new THREE.Vector3(mouseWorld.x, mouseWorld.y + 10, 20));
+
+                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+                    const line = new THREE.Line(geometry, material);
+                    line.name = "right";
+
+                    scene.remove(scene.getObjectByName("right"));
+                    scene.add(line);
                     break;
             }
-            console.log(ch);
+            // console.log(ch);
 
             // }
 
