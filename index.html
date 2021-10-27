@@ -97,11 +97,15 @@
 
         let camera, scene, renderer, effect;
         let mesh, helper;
+
+        let line;
         let line_exist = [4];
         let line_points = [];
+        let geometry;
         // line[2] = 3;
         // line[5] = 8;
         let mouseWorld = new THREE.Vector3();
+        const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
 
         const vpds = [];
 
@@ -114,7 +118,58 @@
 
         });
 
+        function onDocumentKeyPress(event) {
+
+            const keyCode = event.which;
+
+            // backspace
+
+            /* if (keyCode === 8) {
+ 
+                event.preventDefault();
+ 
+            } else { */
+
+            const ch = String.fromCharCode(keyCode);
+
+            switch (ch) {
+                case "1":
+                case "2":
+                case "3":
+                case "4":
+                    /* const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+                    const points = [];
+
+                    points.push(new THREE.Vector3(mouseWorld.x, mouseWorld.y - 10, 20));
+                    points.push(new THREE.Vector3(mouseWorld.x, mouseWorld.y + 10, 20));
+
+                    geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+                    line = new THREE.Line(geometry, material);
+                    line.name = "right";
+
+                    scene.remove(scene.getObjectByName("right"));
+                    scene.add(line); */
+                    line_points[0].set(mouseWorld.x, mouseWorld.y - 10, 20);
+                    line_points[1].set(mouseWorld.x, mouseWorld.y + 10, 20);
+                    geometry.setFromPoints(line_points);
+                    break;
+            }
+            // console.log(ch);
+
+            // }
+
+        }
+
         function init() {
+
+            function initLine() {
+                line_points[0] = new THREE.Vector3(0, 0, 0);
+                line_points[1] = new THREE.Vector3(0, 0, 0);
+                geometry = new THREE.BufferGeometry().setFromPoints(line_points);
+                line = new THREE.Line(geometry, material);
+                scene.add(line);
+            }
 
             const container = document.createElement('div');
             // container.classList.add("three");
@@ -332,6 +387,8 @@
                 poses.open();
                 morphs.open();
 
+                initLine();
+
             }
             document.body.addEventListener('mousemove', onMousemove);
             document.addEventListener('keypress', onDocumentKeyPress);
@@ -364,46 +421,6 @@
                 scene.remove(scene.getObjectByName("right"));
                 scene.add(line);
             } */
-        }
-
-        function onDocumentKeyPress(event) {
-
-            const keyCode = event.which;
-
-            // backspace
-
-            /* if (keyCode === 8) {
-
-                event.preventDefault();
-
-            } else { */
-
-            const ch = String.fromCharCode(keyCode);
-
-            switch (ch) {
-                case "1":
-                case "2":
-                case "3":
-                case "4":
-                    const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
-                    const points = [];
-
-                    points.push(new THREE.Vector3(mouseWorld.x, mouseWorld.y - 10, 20));
-                    points.push(new THREE.Vector3(mouseWorld.x, mouseWorld.y + 10, 20));
-
-                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-                    const line = new THREE.Line(geometry, material);
-                    line.name = "right";
-
-                    scene.remove(scene.getObjectByName("right"));
-                    scene.add(line);
-                    break;
-            }
-            // console.log(ch);
-
-            // }
-
         }
 
         function onWindowResize() {
