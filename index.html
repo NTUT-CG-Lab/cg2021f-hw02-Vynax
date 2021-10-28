@@ -98,10 +98,12 @@
         let camera, scene, renderer, effect;
         let mesh, helper;
 
-        let line;
+        let left_line = [];
         let line_exist = [4];
         let line_points = [];
-        let geometry;
+        let line_now;
+        let left_geometry = [];
+        let line_amount = 4;
         // line[2] = 3;
         // line[5] = 8;
         let mouseWorld = new THREE.Vector3();
@@ -150,9 +152,12 @@
 
                     scene.remove(scene.getObjectByName("right"));
                     scene.add(line); */
-                    line_points[0].set(mouseWorld.x, mouseWorld.y - 10, 20);
-                    line_points[1].set(mouseWorld.x, mouseWorld.y + 10, 20);
-                    geometry.setFromPoints(line_points);
+                    line_now = parseInt(ch, 10);
+                    console.log(mouseWorld.z);
+
+                    line_points[0][0].set(mouseWorld.x, mouseWorld.y - 10, 20);
+                    line_points[0][1].set(mouseWorld.x, mouseWorld.y + 10, 20);
+                    left_geometry[0].setFromPoints(line_points[0]);
                     break;
             }
             // console.log(ch);
@@ -164,11 +169,20 @@
         function init() {
 
             function initLine() {
-                line_points[0] = new THREE.Vector3(0, 0, 0);
-                line_points[1] = new THREE.Vector3(0, 0, 0);
-                geometry = new THREE.BufferGeometry().setFromPoints(line_points);
-                line = new THREE.Line(geometry, material);
-                scene.add(line);
+                for (let i = 0; i < line_amount; i++) {
+                    line_points[i] = [];
+                    line_points[i][0] = new THREE.Vector3(0, 0, 0);
+                    line_points[i][1] = new THREE.Vector3(0, 0, 0);
+                }
+                /* line_points[0] = new THREE.Vector3(0, 0, 0);
+                line_points[1] = new THREE.Vector3(0, 0, 0); */
+                left_geometry[0] = new THREE.BufferGeometry().setFromPoints(line_points[0]);
+                left_geometry[0].attributes.position.needsUpdate = true;
+
+
+                left_line[0] = new THREE.Line(left_geometry[0], material);
+                left_line[0].frustumCulled = false;
+                scene.add(left_line[0]);
             }
 
             const container = document.createElement('div');
