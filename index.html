@@ -94,15 +94,15 @@
         import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
         import { MMDLoader } from './jsm/loaders/MMDLoader.js';
         import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
-        import { Eyeline } from './eyeline.js';
+        import { Edge } from './edge.js';
 
         let camera, scene, renderer, effect;
         let mesh, helper;
 
-        let eline = [];
+        let eye_edges = [];
         let line_exist = [4];
         let line_points = []; // 0~3 是左眼的線 0是下方 1是左側 2是上方 3是右側
-        let line_now = -1;
+        let edge_now = -1;
         let geometry = [];
         let line_amount = 4;
 
@@ -142,18 +142,14 @@
                 case "2":
                 case "3":
                 case "4":
-
-                    if (line_now != -1) {
+                    if (edge_now != -1) {
                         set_Temp_Vector3_0();
-                        eline[line_now].set_Line_Points(temp_Vector3[0], temp_Vector3[1]);
+                        eye_edges[edge_now].set_Line_Points(temp_Vector3[0], temp_Vector3[1]);
                     }
-
-
-                    line_now = parseInt(ch, 10) - 1;
+                    edge_now = parseInt(ch, 10) - 1;
                     horizon_straight();
 
-                    eline[line_now].set_Line_Points(temp_Vector3[0], temp_Vector3[1]);
-
+                    eye_edges[edge_now].set_Line_Points(temp_Vector3[0], temp_Vector3[1]);
                     break;
             }
             // console.log(ch);
@@ -168,7 +164,7 @@
             let temp_x = 0;
 
             // 橫線
-            if (line_now % 2 == 0) {
+            if (edge_now % 2 == 0) {
                 temp_Vector3[0].set(0, mouseWorld.y, 20);
                 temp_Vector3[1].set(10, mouseWorld.y, 20);
             }
@@ -191,7 +187,7 @@
         function draw_MouseMove(event) {
             horizon_straight();
 
-            eline[line_now].set_Line_Points(temp_Vector3[0], temp_Vector3[1]);
+            eye_edges[edge_now].set_Line_Points(temp_Vector3[0], temp_Vector3[1]);
         }
 
         function draw_Click(event) {
@@ -200,7 +196,7 @@
 
             document.removeEventListener('mousemove', draw_MouseMove);
             document.removeEventListener('click', draw_Click);
-            line_now = -1;
+            edge_now = -1;
 
         }
 
@@ -210,8 +206,8 @@
                 temp_Vector3[0] = new THREE.Vector3(0, 0, 0);
                 temp_Vector3[1] = new THREE.Vector3(0, 0, 0);
                 for (let i = 0; i < line_amount; i++) {
-                    eline[i] = new Eyeline(color_hex[i]);
-                    scene.add(eline[i].line);
+                    eye_edges[i] = new Edge(color_hex[i]);
+                    scene.add(eye_edges[i].line);
                 }
             }
 

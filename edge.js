@@ -1,8 +1,8 @@
-// 眼線 = eyeline?
+// 邊框
 
 import * as THREE from './build/three.module.js';
 
-export class Eyeline {
+export class Edge {
     constructor(color_hex) {
         this.points = [];
         this.points[0] = new THREE.Vector3(0, 0, 0);
