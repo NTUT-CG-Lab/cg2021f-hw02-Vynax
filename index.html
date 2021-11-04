@@ -54,7 +54,7 @@
             so.addChild("視角可以移動及放大", 2, true);
             so.addChild("在畫面上畫出左眼的邊框", 2, true);
             so.addChild("複製左眼邊框變化到右眼", 2, true);
-            so.addChild("可選擇當下讀取角色或按鍵選擇上 / 下一隻角色", 1, false);
+            so.addChild("可選擇當下讀取角色或按鍵選擇上 / 下一隻角色", 1, true);
             so.addChild("可儲存座標點檔案", 1, false);
             so.addChild("回答問題", 2, true);
 
@@ -98,7 +98,7 @@
         import { Character } from './character.js';
 
         let camera, scene, renderer, effect;
-        let mesh, helper;
+        let helper;//mesh, 
 
         let eye_edges = [];// 0~3 是左眼的線 0是下方 1是左側 2是上方 3是右側
         let edge_now = -1;
@@ -115,7 +115,7 @@
 
         let json_data;
         let model_path = [];
-        const modelFile = 'models/mmd/kizunaai/kizunaai.pmx';
+        // const modelFile = 'models/mmd/kizunaai/kizunaai.pmx';
         const vpds = [];
         const vpdFiles = [
             'models/mmd/vpds/01.vpd',
@@ -155,6 +155,16 @@
                 console.log(model_path[i]);
             }
         });
+
+        let gui = new GUI();
+
+        let dictionary;
+
+        let controls = {};
+        let keys = [];
+
+        let poses = 0;
+        let morphs = 0;
 
         Ammo().then(function (AmmoLib) {
 
@@ -204,14 +214,27 @@
                     role[role_now].left_copy_to_right(line_amount);
                     break;
 
-                /* case "a":
+                case "a":
                 case "A":
+                    role[role_now].set_Visible(false);
                     if (role_now - 1 < 0)
                         role_now = 0;
                     else
                         role_now = role_now - 1;
-                    init_G
-                    break; */
+                    role[role_now].set_Visible(true);
+                    initGui();
+                    break;
+
+                case "d":
+                case "D":
+                    role[role_now].set_Visible(false);
+                    if (role_now + 1 > role.length - 1)
+                        role_now = role.length - 1;
+                    else
+                        role_now = role_now + 1;
+                    role[role_now].set_Visible(true);
+                    initGui();
+                    break;
             }
 
         }
@@ -322,11 +345,11 @@
 
             for (let i = 0; i < role.length; i++) {
 
-                loader.load(modelFile, function (object) {
+                loader.load(model_path[i], function (object) {
 
                     role[i].mesh = object;
                     role[i].mesh.position.y = - 10;
-
+                    role[i].set_Visible(false);
                     scene.add(role[i].mesh);
 
                 }, onProgress, null);
@@ -375,15 +398,21 @@
 
         function initGui() {
 
-            const gui = new GUI();
+            // let gui = new GUI();
 
-            const dictionary = role[role_now].mesh.morphTargetDictionary;
+            dictionary = role[role_now].mesh.morphTargetDictionary;
 
-            const controls = {};
-            const keys = [];
+            controls = {};
+            keys = [];
 
-            const poses = gui.addFolder('Poses');
-            const morphs = gui.addFolder('Morphs');
+            if (poses != 0)
+                gui.removeFolder(poses);
+
+            if (morphs != 0)
+                gui.removeFolder(morphs);
+
+            poses = gui.addFolder('Poses');
+            morphs = gui.addFolder('Morphs');
 
             function getBaseName(s) {
 
@@ -393,7 +422,7 @@
 
             function initControls() {
 
-                for (const key in dictionary) {
+                for (let key in dictionary) {
 
                     controls[key] = 0.0;
 
@@ -411,7 +440,7 @@
 
             function initKeys() {
 
-                for (const key in dictionary) {
+                for (let key in dictionary) {
 
                     keys.push(key);
 
@@ -421,7 +450,7 @@
 
             function initPoses() {
 
-                const files = { default: - 1 };
+                let files = { default: - 1 };
 
                 for (let i = 0; i < vpdFiles.length; i++) {
 
@@ -435,7 +464,7 @@
 
             function initMorphs() {
 
-                for (const key in dictionary) {
+                for (let key in dictionary) {
 
                     morphs.add(controls, key, 0.0, 1.0, 0.01).onChange(onChangeMorph);
 
@@ -447,8 +476,8 @@
 
                 for (let i = 0; i < keys.length; i++) {
 
-                    const key = keys[i];
-                    const value = controls[key];
+                    let key = keys[i];
+                    let value = controls[key];
                     role[role_now].mesh.morphTargetInfluences[i] = value;
 
                 }
@@ -468,6 +497,7 @@
                     helper.pose(role[role_now].mesh, vpds[index]);
 
                 }
+                role[role_now].set_Visible(true);
 
             }
             initLine();

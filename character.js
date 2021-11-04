@@ -13,7 +13,7 @@ export class Character {
             scene.add(this.eye_edges[i].line);
         }
 
-        // this.mesh
+        this.mesh = 0;
         this.file_path = file_path;
     }
 
@@ -35,5 +35,12 @@ export class Character {
 
             // console.log("1:" + this.eye_edges[i - line_amount].points[0].x + "2:" + this.eye_edges[i - line_amount].points[1].x);
         }
+    }
+
+    set_Visible(true_or_false) {
+        for (let i = 0; i < this.eye_edges.length; i++) {
+            this.eye_edges[i].line.visible = true_or_false;
+        }
+        this.mesh.visible = true_or_false;
     }
 }
