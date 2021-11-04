@@ -109,10 +109,52 @@
         let temp_Vector3 = [];
         let color_hex = [0xFF0000, 0x008000, 0xFF0000, 0x008000, 0x800080, 0x0000FF, 0x800080, 0x0000FF]; // 紅綠紅綠，紫藍紫藍
         let material = [];
-        let kizunaai;
+        let role = [];
+        let role_now = 0;
         // new THREE.LineBasicMaterial({ color: 0x0000ff });
 
+        let json_data;
+        let model_path = [];
+        const modelFile = 'models/mmd/kizunaai/kizunaai.pmx';
         const vpds = [];
+        const vpdFiles = [
+            'models/mmd/vpds/01.vpd',
+            'models/mmd/vpds/02.vpd',
+            'models/mmd/vpds/03.vpd',
+            'models/mmd/vpds/04.vpd',
+            'models/mmd/vpds/05.vpd',
+            'models/mmd/vpds/06.vpd',
+            'models/mmd/vpds/07.vpd',
+            'models/mmd/vpds/08.vpd',
+            //'models/mmd/vpds/09.vpd',
+            //'models/mmd/vpds/10.vpd',
+            'models/mmd/vpds/11.vpd'
+        ];
+
+        function readTextFile(file, callback) {
+            var rawFile = new XMLHttpRequest();
+            rawFile.overrideMimeType("application/json");
+            rawFile.open("GET", file, true);
+            rawFile.onreadystatechange = function () {
+                if (rawFile.readyState === 4 && rawFile.status == "200") {
+                    callback(rawFile.responseText);
+                }
+            }
+            rawFile.send(null);
+        }
+
+
+        //usage:
+        readTextFile("./model_list.json", function (text) {
+            json_data = JSON.parse(text);
+            console.log(json_data);
+            //console.log(json_data.modellist[0].location);
+
+            for (let i = 0; i < json_data.modellist.length; i++) {
+                model_path[i] = json_data.modellist[i].location;
+                console.log(model_path[i]);
+            }
+        });
 
         Ammo().then(function (AmmoLib) {
 
@@ -139,7 +181,7 @@
                 document.removeEventListener('mousemove', draw_MouseMove);
                 document.removeEventListener('click', draw_Click);
                 set_Temp_Vector3_0();
-                kizunaai.set_Line_Points(edge_now, temp_Vector3[0], temp_Vector3[1]);
+                role[role_now].set_Line_Points(edge_now, temp_Vector3[0], temp_Vector3[1]);
             }
             const ch = String.fromCharCode(keyCode);
 
@@ -152,15 +194,24 @@
                     edge_now = parseInt(ch, 10) - 1;
                     horizon_straight();
 
-                    kizunaai.set_Line_Points(edge_now, temp_Vector3[0], temp_Vector3[1]);
+                    role[role_now].set_Line_Points(edge_now, temp_Vector3[0], temp_Vector3[1]);
 
                     document.addEventListener("mousemove", draw_MouseMove);
                     document.addEventListener("click", draw_Click);
                     break;
                 case "q":
                 case "Q":
-                    kizunaai.left_copy_to_right(line_amount);
+                    role[role_now].left_copy_to_right(line_amount);
                     break;
+
+                /* case "a":
+                case "A":
+                    if (role_now - 1 < 0)
+                        role_now = 0;
+                    else
+                        role_now = role_now - 1;
+                    init_G
+                    break; */
             }
 
         }
@@ -192,7 +243,7 @@
         function draw_MouseMove(event) {
             horizon_straight();
 
-            kizunaai.set_Line_Points(edge_now, temp_Vector3[0], temp_Vector3[1]);
+            role[role_now].set_Line_Points(edge_now, temp_Vector3[0], temp_Vector3[1]);
         }
 
         function draw_Click(event) {
@@ -205,17 +256,21 @@
 
         }
 
+        function initLine() {
+            temp_Vector3[0] = new THREE.Vector3(0, 0, 0);
+            temp_Vector3[1] = new THREE.Vector3(0, 0, 0);
+
+            // for (let i = 0; i < line_amount; i++) {
+            //     eye_edges[i] = new Edge(color_hex[i]);
+            //     scene.add(eye_edges[i].line);
+            // }
+        }
         function init() {
 
-            function initLine() {
-                temp_Vector3[0] = new THREE.Vector3(0, 0, 0);
-                temp_Vector3[1] = new THREE.Vector3(0, 0, 0);
 
-                kizunaai = new Character(scene, line_amount, color_hex);
-                // for (let i = 0; i < line_amount; i++) {
-                //     eye_edges[i] = new Edge(color_hex[i]);
-                //     scene.add(eye_edges[i].line);
-                // }
+            function initRoles() {
+                for (let i = 0; i < model_path.length; i++)
+                    role[i] = new Character(scene, model_path[i], line_amount, color_hex);
             }
 
             const container = document.createElement('div');
@@ -248,6 +303,8 @@
 
             // model
 
+            initRoles();
+
             function onProgress(xhr) {
 
                 if (xhr.lengthComputable) {
@@ -259,61 +316,49 @@
 
             }
 
-            const modelFile = 'models/mmd/kizunaai/kizunaai.pmx';
-            const vpdFiles = [
-                'models/mmd/vpds/01.vpd',
-                'models/mmd/vpds/02.vpd',
-                'models/mmd/vpds/03.vpd',
-                'models/mmd/vpds/04.vpd',
-                'models/mmd/vpds/05.vpd',
-                'models/mmd/vpds/06.vpd',
-                'models/mmd/vpds/07.vpd',
-                'models/mmd/vpds/08.vpd',
-                //'models/mmd/vpds/09.vpd',
-                //'models/mmd/vpds/10.vpd',
-                'models/mmd/vpds/11.vpd'
-            ];
-
             helper = new MMDAnimationHelper();
 
             const loader = new MMDLoader();
 
-            loader.load(modelFile, function (object) {
+            for (let i = 0; i < role.length; i++) {
 
-                mesh = object;
-                mesh.position.y = - 10;
+                loader.load(modelFile, function (object) {
 
-                scene.add(mesh);
+                    role[i].mesh = object;
+                    role[i].mesh.position.y = - 10;
 
-                let vpdIndex = 0;
+                    scene.add(role[i].mesh);
 
-                function loadVpd() {
+                }, onProgress, null);
+            }
 
-                    const vpdFile = vpdFiles[vpdIndex];
+            let vpdIndex = 0;
 
-                    loader.loadVPD(vpdFile, false, function (vpd) {
+            function loadVpd() {
 
-                        vpds.push(vpd);
+                const vpdFile = vpdFiles[vpdIndex];
 
-                        vpdIndex++;
+                loader.loadVPD(vpdFile, false, function (vpd) {
 
-                        if (vpdIndex < vpdFiles.length) {
+                    vpds.push(vpd);
 
-                            loadVpd();
+                    vpdIndex++;
 
-                        } else {
+                    if (vpdIndex < vpdFiles.length) {
 
-                            initGui();
+                        loadVpd();
 
-                        }
+                    } else {
 
-                    }, onProgress, null);
+                        initGui();
 
-                }
+                    }
 
-                loadVpd();
+                }, onProgress, null);
 
-            }, onProgress, null);
+            }
+
+            loadVpd();
 
             //
 
@@ -323,120 +368,121 @@
             cameracontrols.minDistance = 10;
             cameracontrols.maxDistance = 100;
             cameracontrols.enableRotate = false;
-            function initGui() {
 
-                const gui = new GUI();
-
-                const dictionary = mesh.morphTargetDictionary;
-
-                const controls = {};
-                const keys = [];
-
-                const poses = gui.addFolder('Poses');
-                const morphs = gui.addFolder('Morphs');
-
-                function getBaseName(s) {
-
-                    return s.slice(s.lastIndexOf('/') + 1);
-
-                }
-
-                function initControls() {
-
-                    for (const key in dictionary) {
-
-                        controls[key] = 0.0;
-
-                    }
-
-                    controls.pose = - 1;
-
-                    for (let i = 0; i < vpdFiles.length; i++) {
-
-                        controls[getBaseName(vpdFiles[i])] = false;
-
-                    }
-
-                }
-
-                function initKeys() {
-
-                    for (const key in dictionary) {
-
-                        keys.push(key);
-
-                    }
-
-                }
-
-                function initPoses() {
-
-                    const files = { default: - 1 };
-
-                    for (let i = 0; i < vpdFiles.length; i++) {
-
-                        files[getBaseName(vpdFiles[i])] = i;
-
-                    }
-
-                    poses.add(controls, 'pose', files).onChange(onChangePose);
-
-                }
-
-                function initMorphs() {
-
-                    for (const key in dictionary) {
-
-                        morphs.add(controls, key, 0.0, 1.0, 0.01).onChange(onChangeMorph);
-
-                    }
-
-                }
-
-                function onChangeMorph() {
-
-                    for (let i = 0; i < keys.length; i++) {
-
-                        const key = keys[i];
-                        const value = controls[key];
-                        mesh.morphTargetInfluences[i] = value;
-
-                    }
-
-                }
-
-                function onChangePose() {
-
-                    const index = parseInt(controls.pose);
-
-                    if (index === - 1) {
-
-                        mesh.pose();
-
-                    } else {
-
-                        helper.pose(mesh, vpds[index]);
-
-                    }
-
-                }
-
-                initControls();
-                initKeys();
-                initPoses();
-                initMorphs();
-
-                onChangeMorph();
-                onChangePose();
-
-                poses.open();
-                morphs.open();
-
-                initLine();
-
-            }
             document.body.addEventListener('mousemove', onMousemove);
             document.addEventListener('keypress', onDocumentKeyPress);
+        }
+
+        function initGui() {
+
+            const gui = new GUI();
+
+            const dictionary = role[role_now].mesh.morphTargetDictionary;
+
+            const controls = {};
+            const keys = [];
+
+            const poses = gui.addFolder('Poses');
+            const morphs = gui.addFolder('Morphs');
+
+            function getBaseName(s) {
+
+                return s.slice(s.lastIndexOf('/') + 1);
+
+            }
+
+            function initControls() {
+
+                for (const key in dictionary) {
+
+                    controls[key] = 0.0;
+
+                }
+
+                controls.pose = - 1;
+
+                for (let i = 0; i < vpdFiles.length; i++) {
+
+                    controls[getBaseName(vpdFiles[i])] = false;
+
+                }
+
+            }
+
+            function initKeys() {
+
+                for (const key in dictionary) {
+
+                    keys.push(key);
+
+                }
+
+            }
+
+            function initPoses() {
+
+                const files = { default: - 1 };
+
+                for (let i = 0; i < vpdFiles.length; i++) {
+
+                    files[getBaseName(vpdFiles[i])] = i;
+
+                }
+
+                poses.add(controls, 'pose', files).onChange(onChangePose);
+
+            }
+
+            function initMorphs() {
+
+                for (const key in dictionary) {
+
+                    morphs.add(controls, key, 0.0, 1.0, 0.01).onChange(onChangeMorph);
+
+                }
+
+            }
+
+            function onChangeMorph() {
+
+                for (let i = 0; i < keys.length; i++) {
+
+                    const key = keys[i];
+                    const value = controls[key];
+                    role[role_now].mesh.morphTargetInfluences[i] = value;
+
+                }
+
+            }
+
+            function onChangePose() {
+
+                const index = parseInt(controls.pose);
+
+                if (index === - 1) {
+
+                    role[role_now].mesh.pose();
+
+                } else {
+
+                    helper.pose(role[role_now].mesh, vpds[index]);
+
+                }
+
+            }
+            initLine();
+
+            initControls();
+            initKeys();
+            initPoses();
+            initMorphs();
+
+            onChangeMorph();
+            onChangePose();
+
+            poses.open();
+            morphs.open();
+
         }
 
         function onMousemove(e) {

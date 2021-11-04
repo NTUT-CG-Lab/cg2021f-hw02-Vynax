@@ -4,7 +4,7 @@ import { Edge } from './edge.js';
 import * as THREE from './build/three.module.js';
 
 export class Character {
-    constructor(scene, line_amount, color_hex) {
+    constructor(scene, file_path, line_amount, color_hex) {
         this.eye_edges = [];
         // 0~3 是左眼的邊框 0是下方 1是左側 2是上方 3是右側
         // 4~7 是右眼的邊框 4是下方 5是左側 6是上方 7是右側
@@ -12,6 +12,9 @@ export class Character {
             this.eye_edges[i] = new Edge(color_hex[i]);
             scene.add(this.eye_edges[i].line);
         }
+
+        // this.mesh
+        this.file_path = file_path;
     }
 
     set_Line_Points(edge_now, point1, point2) {
