@@ -147,14 +147,28 @@
         //usage:
         readTextFile("./model_list.json", function (text) {
             json_data = JSON.parse(text);
-            console.log(json_data);
+            // console.log(json_data);
             //console.log(json_data.modellist[0].location);
 
             for (let i = 0; i < json_data.modellist.length; i++) {
                 model_path[i] = json_data.modellist[i].location;
                 console.log(model_path[i]);
             }
+
+            for (let i = 0; i < json_data.modellist.length; i++) {
+                for (let j in json_data.modellist[i]) {
+                    console.log(json_data.modellist[i][j]);
+                }
+            }
         });
+
+        function download(content, fileName, contentType) {
+            var a = document.createElement("a");
+            var file = new Blob([content], { type: contentType });
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+        }
 
         let gui = new GUI();
 
@@ -214,6 +228,7 @@
                     role[role_now].left_copy_to_right(line_amount);
                     break;
 
+
                 case "a":
                 case "A":
                     role[role_now].set_Visible(false);
@@ -234,6 +249,10 @@
                         role_now = role_now + 1;
                     role[role_now].set_Visible(true);
                     initGui();
+                    break;
+                case "s":
+                case "S":
+                    download(JSON.stringify(json_data, null, 4), 'model_data_test.json', 'text/plain');
                     break;
             }
 
