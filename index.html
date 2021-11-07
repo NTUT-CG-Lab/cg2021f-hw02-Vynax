@@ -55,7 +55,7 @@
             so.addChild("在畫面上畫出左眼的邊框", 2, true);
             so.addChild("複製左眼邊框變化到右眼", 2, true);
             so.addChild("可選擇當下讀取角色或按鍵選擇上 / 下一隻角色", 1, true);
-            so.addChild("可儲存座標點檔案", 1, false);
+            so.addChild("可儲存座標點檔案", 1, true);
             so.addChild("回答問題", 2, true);
 
             //產生自評表，參數如下所示
@@ -113,7 +113,7 @@
         let role_now = 0;
         // new THREE.LineBasicMaterial({ color: 0x0000ff });
 
-        let json_data;
+        // let json_data;
         let model_path = [];
         // const modelFile = 'models/mmd/kizunaai/kizunaai.pmx';
         const vpds = [];
@@ -146,7 +146,7 @@
 
         //usage:
         readTextFile("./model_list.json", function (text) {
-            json_data = JSON.parse(text);
+            let json_data = JSON.parse(text);
             // console.log(json_data);
             //console.log(json_data.modellist[0].location);
 
@@ -161,6 +161,16 @@
                 }
             }
         });
+        function make_all_character_json() {
+            let json_data = {
+                modellist: []
+            };
+            for (let i = 0; i < role.length; i++) {
+                json_data.modellist.push(role[i].make_JSON_point());
+            }
+
+            return json_data;
+        }
 
         function download(content, fileName, contentType) {
             var a = document.createElement("a");
@@ -252,7 +262,8 @@
                     break;
                 case "s":
                 case "S":
-                    download(JSON.stringify(json_data, null, 4), 'model_data_test.json', 'text/plain');
+                    let json_data = JSON.stringify(make_all_character_json(), null, 4);
+                    download(json_data, 'model_data_test.json', 'text/plain');
                     break;
             }
 

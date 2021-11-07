@@ -43,4 +43,31 @@ export class Character {
         }
         this.mesh.visible = true_or_false;
     }
+
+    make_JSON_point() {
+        let jsonData = {};
+        jsonData["location"] = this.file_path;
+
+        let prefix = "line_location";
+        let column_name, x_or_y;
+
+
+        // 左邊直線 的 x 搭配下方邊框的 y
+        jsonData[prefix + "x_1"] = this.eye_edges[1].points[0].x;
+        jsonData[prefix + "y_1"] = this.eye_edges[0].points[0].y;
+
+        // 左邊直線 的 x 搭配上方邊框的 y
+        jsonData[prefix + "x_2"] = this.eye_edges[1].points[0].x;
+        jsonData[prefix + "y_2"] = this.eye_edges[2].points[0].y;
+
+        // 右邊直線 的 x 搭配上方邊框的 y
+        jsonData[prefix + "x_3"] = this.eye_edges[3].points[0].x;
+        jsonData[prefix + "y_3"] = this.eye_edges[2].points[0].y;
+
+        // 右邊直線 的 x 搭配下方邊框的 y
+        jsonData[prefix + "x_4"] = this.eye_edges[3].points[0].x;
+        jsonData[prefix + "y_4"] = this.eye_edges[0].points[0].y;
+
+        return jsonData;
+    }
 }
